@@ -45,10 +45,9 @@ public class Encode {
         asciiBinaryHashMap.put(key, binaryOfAscii);
     }
 
-    private void encryptBytesIntoImage(){
-
+    public HashMap<Integer,Integer[]> returnBinaryHashMap(){
+        return asciiBinaryHashMap;
     }
-
 
     private void callDecode(){
         decode.passBinary(asciiBinaryHashMap);

@@ -3,6 +3,7 @@ package com.secvault.android.secvault;
 import android.util.Log;
 
 import com.secvault.android.secvault.cryptography.Encode;
+import com.secvault.android.secvault.cryptography.Encryption;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
 
 public class PlantIntoFile {
 
@@ -32,6 +34,7 @@ public class PlantIntoFile {
 
     private File fileSelectedByUser;
     private RandomAccessFile copiedFile;
+    private Encryption encryptionClass = new Encryption();
 
 
     public void copyFileToExternalDir(String fromFile, String folderDestinationFromUser) {
@@ -59,6 +62,8 @@ public class PlantIntoFile {
             //the story of encoding
             encodeFileNameToBytes();
             writeBytesIntoFile(fileNameToBytes);
+            convertBytesToAsciiAndGetBinaryHashMap();
+            encryptionClass.passFileAndBinaryHashMapToEncrypt(copiedFile, encodeClass.returnBinaryHashMap());
             closeStreams();
 
         }catch (Exception e) {
@@ -76,9 +81,12 @@ public class PlantIntoFile {
         fileName = fileSelectedByUser.getName();
     //    addNullTerminatorToFileName();
         fileNameToBytes = fileName.getBytes();
-        Log.i(TAG,fileNameToBytes.toString());
+    }
+
+    private void convertBytesToAsciiAndGetBinaryHashMap(){
         encodeClass.getBinaryOfAscii(fileNameToBytes);
     }
+
 
     //THIS WAS USED BEFORE I USED LSB. I added the null byte at the end of the file name, so that
     //when i embedded into the image, I would know when to stop getting bytes from it.
@@ -90,18 +98,20 @@ public class PlantIntoFile {
         Log.i(TAG, "added null to file name " + fileName);
     }
 
+
+    //TODO once I get LSB working, the below can be commented out
     private void writeBytesIntoFile(byte[] bytesToWrite){  //added a parameter, so we can reuse this function
 
         try{
 
             copiedFile.seek(copiedFile.length());
-           // copiedFile.seek(whereToStartAddingBytes);
+        //    copiedFile.seek(whereToStartAddingBytes);
             copiedFile.write(bytesToWrite);
+
         }
         catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     private void closeStreams(){

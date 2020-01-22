@@ -80,44 +80,20 @@ public class Decryption {
 
         try {
             usersFile = new FileInputStream(filePickedByUser.getPath());
-        //    outFile = new FileOutputStream(filePickedByUser.getParent() + "/" + fileNameFromEncryptedFile);
+        //  outFile = new FileOutputStream(filePickedByUser.getParent() + "/" + fileNameFromEncryptedFile);
             outFile = new FileOutputStream(filePickedByUser.getParent() + "/Chrono.jpg");
 
             try {
 
                 byte[] buf = new byte[1995];
-                //usersFile.read(buf);
-                //outFile.write(buf);
-              //  usersFile.skip(untilNull);
-                //buf = new byte[1024];
                 int read;
                 while ((read = usersFile.read(buf)) > 0){
                     outFile.write(buf,0,read);
                 }
 
-                /*
-                byte [] bytesFromOriginalImage = new byte[125000];
-                fileToDecrypt.read(bytesFromOriginalImage,0,1995);
-                fileToDecrypt.seek(1995+ untilNull);
-                fileToDecrypt.read(bytesFromOriginalImage,1995,bytesFromOriginalImage.length - 1995);
-                outFile.write(bytesFromOriginalImage);
-
-                 */
-
-                /*
-                byte [] bytesForOriginalImage2 = new byte[125000];
-                fileToDecrypt.seek(1995+untilNull);
-                fileToDecrypt.read(bytesForOriginalImage2,0,125000);
-                outFile.write(bytesForOriginalImage2,0,bytesForOriginalImage2.length);
-
-                 */
-
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
