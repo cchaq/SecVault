@@ -15,9 +15,11 @@ public class Encryption {
     private static final String TAG = "Encryption class : ";
     private static final int whereToStartEmbedding = 1995;
 
+    private String practiceConstructor;
+
     private RandomAccessFile copiedFile;
     private HashMap<Integer,Integer[]> binaryAsciiHashMap;
-    private byte[] anArrayOfBytes; //TODO we should use the lenght of the hashmap size passed through
+    private byte[] anArrayOfBytes;
     private int increasingKey;
     private String binary = "";
     private byte byteFromBinary;
@@ -26,17 +28,38 @@ public class Encryption {
     private int sizeOfBinaryHashMap;
     private List<Byte> finalLSBArray = new ArrayList<>();
 
+    public Encryption(){
+        this.practiceConstructor = "Encryption class";
+        Log.i(TAG,practiceConstructor + " has been loaded");
+    }
+
     public void passFileAndBinaryHashMapToEncrypt(RandomAccessFile fileForEmbedding, HashMap binaryHashMapFromEncodeClass){
         copiedFile = fileForEmbedding;
         binaryAsciiHashMap = binaryHashMapFromEncodeClass;
         sizeOfBinaryHashMap = binaryHashMapFromEncodeClass.size();
+
+
+        setFilePointer(); //To stop it from reading over the same place and to always start at the same place
         makeByteFromBinaryInHashMap();
+
+    }
+
+    private void setFilePointer(){
+
+        try {
+
+            copiedFile.seek(whereToStartEmbedding);
+            increaseWhereToReadByOne  = 1;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
     private void makeByteFromBinaryInHashMap(){
 
-        for(increasingKey =0; increasingKey < binaryAsciiHashMap.size(); increasingKey++){
+        for(increasingKey = 0; increasingKey < binaryAsciiHashMap.size(); increasingKey++){
             Integer[] bits = binaryAsciiHashMap.get(increasingKey);
 
             for (int bitInValue = 0; bitInValue < 8; bitInValue++){
@@ -51,25 +74,23 @@ public class Encryption {
         byteFromBinary = Byte.parseByte(binary,2);
         embedBinaryUsingLSB(byteFromBinary);
 
-        makeAsciiFromByte();
+        //makeAsciiFromByte(); //Testing purposes
     }
 
     //Just for converting the byte to ascii.
     private void makeAsciiFromByte(){
 
         char asciiFromByte = (char) byteFromBinary;
-        Log.i(TAG, String.valueOf(asciiFromByte));
+      //  Log.i(TAG, String.valueOf(asciiFromByte));
 
     }
 
     private void embedBinaryUsingLSB(byte byteToAdd){
         try {
 
-            copiedFile.seek(whereToStartEmbedding);
             anArrayOfBytes = new byte[sizeOfBinaryHashMap];
             copiedFile.read(anArrayOfBytes);
 
-            increaseWhereToReadByOne  = 1;
             readByte = 0;
 
             for(int bitsInValue = 7; bitsInValue >= 0; bitsInValue--){
@@ -88,7 +109,7 @@ public class Encryption {
         }
     }
 
-    private List<Byte> returnListOfLSBBytes(){
-        return finalLSBArray;
+    public List<Byte> returnListOfLSBBytes(){
+        return this.finalLSBArray;
     }
 }

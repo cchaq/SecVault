@@ -1,23 +1,26 @@
 package com.secvault.android.secvault;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.secvault.android.secvault.cryptography.Encode;
 import com.secvault.android.secvault.cryptography.Encryption;
+import com.secvault.android.secvault.cryptography.FileEncryption;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
+import java.util.List;
 
-public class PlantIntoFile {
+public class EncryptAll extends Activity {
 
-    private static final String TAG = "PlantIntoFile class";  //TODO I need a better name, noun name needed
-    private static final int whereToStartAddingBytes = 1995;
+    private static final String TAG = "EncryptAll class";
+    public static final int whereToStartAddingBytes = 1995;
 
     File_All file_all_class = new File_All();
     private Encode encodeClass = new Encode();
@@ -26,7 +29,7 @@ public class PlantIntoFile {
     private String newFileName;
     private String mimeType;
     private String fileName;
-    private String fileOutputDirString;
+    private String fileOutputDirString; //This is the file that has been copied and with the name embedded.
 
     private InputStream usersFile;
     private OutputStream outFile;
@@ -35,7 +38,7 @@ public class PlantIntoFile {
     private File fileSelectedByUser;
     private RandomAccessFile copiedFile;
     private Encryption encryptionClass = new Encryption();
-
+    private RandomAccessFile RAFToReturn;
 
     public void copyFileToExternalDir(String fromFile, String folderDestinationFromUser) {
 
@@ -49,7 +52,7 @@ public class PlantIntoFile {
             usersFile = new FileInputStream(fromFile);
             outFile = new FileOutputStream(fileOutputDirString);
 
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[1995];
 
             int bytesRead;
             while ((bytesRead = usersFile.read(buf)) > 0){
@@ -57,14 +60,16 @@ public class PlantIntoFile {
                 outFile.write(buf, 0, bytesRead);
             }
 
-            copiedFile = new RandomAccessFile(fileOutputDirString, "rw");
+       //     copiedFile = new RandomAccessFile(fileOutputDirString, "rw");
+            copiedFile = this.returnRAFFileOfPassedFilePath(fileOutputDirString);
 
-            //the story of encoding
+            //the story of encoding and encrypting
             encodeFileNameToBytes();
-            writeBytesIntoFile(fileNameToBytes);
             convertBytesToAsciiAndGetBinaryHashMap();
             encryptionClass.passFileAndBinaryHashMapToEncrypt(copiedFile, encodeClass.returnBinaryHashMap());
+            writeBytesIntoFile();
             closeStreams();
+
 
         }catch (Exception e) {
             e.printStackTrace();
@@ -79,7 +84,7 @@ public class PlantIntoFile {
     private void encodeFileNameToBytes(){
 
         fileName = fileSelectedByUser.getName();
-    //    addNullTerminatorToFileName();
+     //   addNullTerminatorToFileName(); //not needed because i am adding the null term in writeBytesIntoFile
         fileNameToBytes = fileName.getBytes();
     }
 
@@ -88,25 +93,31 @@ public class PlantIntoFile {
     }
 
 
-    //THIS WAS USED BEFORE I USED LSB. I added the null byte at the end of the file name, so that
-    //when i embedded into the image, I would know when to stop getting bytes from it.
-
     private void addNullTerminatorToFileName(){
 
-        fileName = fileName.concat(nullTerminator);
 
+        //fileName =  fileName.concat(nullTerminator);
+        fileName = nullTerminator + fileName;
         Log.i(TAG, "added null to file name " + fileName);
     }
 
 
-    //TODO once I get LSB working, the below can be commented out
-    private void writeBytesIntoFile(byte[] bytesToWrite){  //added a parameter, so we can reuse this function
+    //TODO how to embed the bytes anywhere within the image
+    private void writeBytesIntoFile(){
 
         try{
 
             copiedFile.seek(copiedFile.length());
-        //    copiedFile.seek(whereToStartAddingBytes);
-            copiedFile.write(bytesToWrite);
+         //   copiedFile.seek(whereToStartAddingBytes);
+            List<Byte> bytesToEmbed = encryptionClass.returnListOfLSBBytes();
+            copiedFile.write(0x63); //have to do it byte by byte
+            copiedFile.write(0x68);
+            copiedFile.write(0x6F); //chro //TODO see if we can find this within the bytes
+            copiedFile.write(0x72);
+            for(int i = 0; i < bytesToEmbed.size(); i++) {
+
+                copiedFile.write(bytesToEmbed.get(i));
+            }
 
         }
         catch (Exception e){
@@ -120,9 +131,24 @@ public class PlantIntoFile {
             outFile.close();
             copiedFile.close();
 
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    //This has to be done because I didn't properly plan this in the past.
+
+    public RandomAccessFile returnRAFFileOfPassedFilePath(String filePath) {
+
+        try {
+            RAFToReturn = new RandomAccessFile(filePath, "rw");
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return RAFToReturn;
     }
 
 }

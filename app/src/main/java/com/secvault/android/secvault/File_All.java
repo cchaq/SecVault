@@ -18,15 +18,15 @@ public class File_All {
     private Cursor fileCursor;
     private String destFolder;
 
-    private String lowerCaseAlphabet = "abcedfghijklmnopqrstxyz";
-    private String upperCaseAlphabet = lowerCaseAlphabet.toUpperCase();
+    private static final String lowerCaseAlphabet = "abcedfghijklmnopqrstxyz";
+    private static final String upperCaseAlphabet = lowerCaseAlphabet.toUpperCase();
     private char[] fullAlphabet = lowerCaseAlphabet.concat(upperCaseAlphabet).toCharArray();
 
     private SecureRandom secureRandom = new SecureRandom();
     private StringBuilder randomFileName = new StringBuilder();
     private File fileOriginalDetails;
 
-    private PlantIntoFile plantIntoFile;
+    private EncryptAll encryptAll;
 
     public void fromFileGetRealData(Uri fileUri, ContentResolver contentResolver) {
 
@@ -47,14 +47,14 @@ public class File_All {
 
     private void copyFile(String fromFile) {
 
-        plantIntoFile = new PlantIntoFile();
-        plantIntoFile.copyFileToExternalDir(fromFile, destFolder);
+        encryptAll = new EncryptAll();
+        encryptAll.copyFileToExternalDir(fromFile, destFolder);
 
     }
 
     public String createNewFileName(){
 
-        for(int buildingFileLength = 0; buildingFileLength< 10; buildingFileLength++){ //TODO instead of  "< 10" the integer should be random, also
+        for(int buildingFileLength = 0; buildingFileLength< 10; buildingFileLength++){ //TODO this should really be in an encrypt class
             int index = secureRandom.nextInt(fullAlphabet.length);
             char letter = fullAlphabet[index];
             randomFileName.append(letter);

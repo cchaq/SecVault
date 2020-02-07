@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity  implements LifecycleObserve
 
         permissions.checkPermissions(this);
 
-        foldersClass.createExternalFolder();
+        foldersClass.createExternalFolders();
 
         setAllButtonsOnClickListener();
     }
@@ -73,4 +73,5 @@ public class MainActivity extends AppCompatActivity  implements LifecycleObserve
         toRootDir.putExtra("folderName",folderName);
         startActivity(toRootDir);
     }
+
 }

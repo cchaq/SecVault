@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rl_mainAct">
+
+        <Button
+            android:id="@+id/buttonListFolders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/users_folder"
+            android:layout_below="@id/WelcomeText"
+            android:layout_centerHorizontal="true">
+        </Button>
+
+        <TextView
+            android:id="@+id/WelcomeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="@string/String_WelcomeText"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/text_size_14sp"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:padding="@dimen/text_box_padding_first">
+        </TextView>
+
+        <EditText
+            android:id="@+id/nameInputForCreateFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="#000000 "
+            android:textSize="@dimen/text_size_14sp"
+            android:hint="@string/name_folder"
+            android:inputType="text"
+            android:layout_centerInParent="true">
+        </EditText>
+        <Button
+            android:id="@+id/buttonHomeScreenSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/submit"
+            android:layout_below="@id/nameInputForCreateFolder"
+            android:layout_centerHorizontal="true">
+        </Button>
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

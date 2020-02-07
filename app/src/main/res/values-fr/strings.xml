@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SecVault</string>
+    <string name="String_WelcomeText">Chiffrez vos fichiers.</string>
+    <string name="name_folder">Nommez votre nouveau dossier</string>
+    <string name="submit">Soumettre</string>
+    <string name="open_Folder">dossier ouvert</string>
+    <string name="users_folder">Mes dossiers</string>
+    <string name="encrypt_file">Chiffrer cela</string>
+    <string name="get_original">Obtenir le nom du fichier d\'origine</string>
+</resources>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SecVault</string>
+    <string name="String_WelcomeText">Encrypt your files.</string>
+    <string name="name_folder">Name your new folder</string>
+    <string name="submit">Submit</string>
+    <string name="open_Folder">Open folder</string>
+    <string name="users_folder">My folders</string>
+    <string name="encrypt_file">Encrypt this file</string>
+    <string name="get_original">Get Original file name</string>
+</resources>

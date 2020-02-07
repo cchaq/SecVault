@@ -53,8 +53,10 @@ public class RootDir_Activity extends AppCompatActivity {
 
     //listView vs recyclerView vs adapterView??
     private void listFolders(){
+
         listViewRootDir = findViewById(R.id.listViewRootDir);
         dirListings = folders.returnListOfDirs();
+
         ArrayAdapter arrayAdapterDirListings = new ArrayAdapter<>(this,
                 R.layout.textbox_folder_dir,R.id.textView_dir_string,dirListings);
         listViewRootDir.setAdapter(arrayAdapterDirListings);

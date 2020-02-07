@@ -17,11 +17,21 @@ public class Permissions {
             != PackageManager.PERMISSION_GRANTED){
                 askForReadExternalPerm((Activity) activity);
         }
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            !=PackageManager.PERMISSION_GRANTED){
+            askForWriteExternalPerm((Activity) activity);
+        }
     }
 
     private void askForReadExternalPerm(Activity activity){
         ActivityCompat.requestPermissions(activity,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                EXTERNAL_PERMISSIONS_REQUEST);
+    }
+
+    private void askForWriteExternalPerm(Activity activity){
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 EXTERNAL_PERMISSIONS_REQUEST);
     }
 }

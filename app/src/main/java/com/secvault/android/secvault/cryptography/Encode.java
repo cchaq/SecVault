@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class Encode {
 
     //https://www.dreamincode.net/forums/topic/27950-steganography/
+    //This works because I checked the hex via HxD, got the last bit from the first 8 and last 8 bytes and it does convert into the word I encoded using LSB
 
     private static final String TAG = "Encode class: ";
 
@@ -13,9 +14,6 @@ public class Encode {
     private Integer[] binaryOfAscii;
     private int asciiCode;
     private HashMap<Integer,Integer[]> asciiBinaryHashMap = new HashMap<>();
-
-    private Decode decode = new Decode();
-    private Encryption encryptionClass = new Encryption();
 
     public void getBinaryOfAscii(byte[] passedInByteArray){
 
@@ -26,7 +24,6 @@ public class Encode {
             asciiToBinary(bytePositioningInPassedByteArray);
 
         }
-        callDecode(); //TODO only used to test it, but this will be called at a different time
     }
 
     private void asciiToBinary(int bytePositioningInPassedByteArray){  //I WANTED TO USE ASCIICODE AS THE KEY BUT HASHMAP DOES NOT ALLOW DUPLICATE VALUES
@@ -49,7 +46,4 @@ public class Encode {
         return asciiBinaryHashMap;
     }
 
-    private void callDecode(){
-        decode.passBinary(asciiBinaryHashMap);
-    }
 }

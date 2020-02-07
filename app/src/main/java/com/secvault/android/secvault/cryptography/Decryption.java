@@ -15,18 +15,21 @@ import java.io.RandomAccessFile;
 public class Decryption {
 
     private static final String TAG = "Decryption class";
-    private static final int whereToStartReadingBytesFrom = 1995; //TODO Instead of duplicating this, use a pointer to the one in encryption class
 
-    private static String nullTerminator = "\u0000";
+    private static int nullTerminator = 0x000000;
     private String bytesToString;
     private  byte[] readBytesFromFile;
+    private byte[] encryptedText;
     private int untilNull;
     private String fileNameFromEncryptedFile;
     private File filePickedByUser;
+    int indexOfChor = 0;
 
     private RandomAccessFile fileToDecrypt;
     private InputStream usersFile;
     private OutputStream outFile;
+    private Decode decodeClass = new Decode();
+
 
 
     public void passFullFilePath(String originalFullFilePath){
@@ -44,44 +47,63 @@ public class Decryption {
             getEmbeddedFileNameFromFile();
             makeOriginalFile();
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        getEmbeddedFileNameFromFile();
     }
 
     private void getEmbeddedFileNameFromFile() {
-        readBytesFromFile = new byte[100];                //Unlikely someone will have a 100+ byte sized named.
+        readBytesFromFile = new byte[1001];                //Unlikely someone will have a 1001+ byte sized named. //TODO what if it is a message?
 
         try {
 
-            fileToDecrypt.seek(whereToStartReadingBytesFrom);
+            fileToDecrypt.seek(fileToDecrypt.length()  - 1001);
             fileToDecrypt.read(readBytesFromFile);
 
-            convertBytesToString();
+            findChor();
 
         } catch (IOException e) {
-
             e.printStackTrace();
         }
 
     }
 
-    private void convertBytesToString(){
 
-        bytesToString = new String(readBytesFromFile);
-//        untilNull =  bytesToString.indexOf(nullTerminator);
-  //      fileNameFromEncryptedFile = bytesToString.substring(0,untilNull);
-    //    Log.i(TAG,fileNameFromEncryptedFile);
+    private void findChor(){
 
+        for(int findingIndexOfChor = readBytesFromFile.length -1; findingIndexOfChor > 0; findingIndexOfChor --){
+            if(readBytesFromFile[findingIndexOfChor] == 114){
+
+                if(readBytesFromFile[findingIndexOfChor - 1]  == 111){
+                    indexOfChor = findingIndexOfChor + 1;
+                    encryptedText = new byte[readBytesFromFile.length - indexOfChor];
+                   break;
+                }
+            }
+        }
+        addHexBytesToEncryptedTextByeArray();
     }
 
-    private void makeOriginalFile(){
+    private void addHexBytesToEncryptedTextByeArray(){
+        int increasingEncryptedTextIndex = 0;
+
+        for(int countingIndex = indexOfChor; countingIndex < readBytesFromFile.length; countingIndex++){
+            encryptedText[increasingEncryptedTextIndex] = readBytesFromFile[countingIndex];
+            increasingEncryptedTextIndex++;
+        }
+        decodeBytes();
+    }
+
+    private void decodeBytes(){
+        decodeClass.passEncryptedTextInByteArray(encryptedText);
+    }
+
+
+    private void makeOriginalFile(){  //TODO maybe we do not need this?
 
         try {
             usersFile = new FileInputStream(filePickedByUser.getPath());
-        //  outFile = new FileOutputStream(filePickedByUser.getParent() + "/" + fileNameFromEncryptedFile);
-            outFile = new FileOutputStream(filePickedByUser.getParent() + "/Chrono.jpg");
+            outFile = new FileOutputStream(filePickedByUser.getParent() + "/" + decodeClass.returnFineName());
 
             try {
 
@@ -97,9 +119,5 @@ public class Decryption {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-
     }
-
-
 }
