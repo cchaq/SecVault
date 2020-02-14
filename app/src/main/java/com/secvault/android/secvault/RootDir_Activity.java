@@ -21,6 +21,7 @@ public class RootDir_Activity extends AppCompatActivity {
     List<String> dirListings;
 
     private Intent fromMainActivity;
+    private Intent goToFilesActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,17 +67,21 @@ public class RootDir_Activity extends AppCompatActivity {
     private void setFolderPathOnClickListener(){
         listViewRootDir.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int arrayIndex, long l) {
-                Log.i(TAG,arrayIndex + "= i and  j = " + l);
-                Log.i(TAG,dirListings.get(arrayIndex));
-                goIntoTheFolder(dirListings.get(arrayIndex));
+            public void onItemClick(AdapterView<?> adapterView, View view, int folderIndex, long l) {
+                Log.i(TAG,dirListings.get(folderIndex));
+                goIntoTheFolder(dirListings.get(folderIndex));
             }
         });
     }
 
-    private void goIntoTheFolder(String folderPath){
-        Intent goToFilesActivity = new Intent(this, FilesWithinFolder_Activity.class);
-        goToFilesActivity.putExtra("folderPath",folderPath);
+    private void goIntoTheFolder(String folderPath) {
+        if (folderPath.endsWith("Encrypted")) {
+            goToFilesActivity = new Intent(this, EncryptFolder_Activity.class);
+        } else {
+            goToFilesActivity = new Intent(this, FilesWithinFolder_Activity.class);
+        }
+
+        goToFilesActivity.putExtra("folderPath", folderPath);
         startActivity(goToFilesActivity);
     }
 }

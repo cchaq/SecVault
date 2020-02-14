@@ -1,6 +1,5 @@
 package com.secvault.android.secvault.cryptography;
 
-import android.print.PageRange;
 import android.util.Log;
 
 import com.secvault.android.secvault.Folders;
@@ -10,11 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Array;
-import java.security.AlgorithmParameters;
-import java.security.SecureRandom;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -28,7 +23,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class FileEncryption {
 
-    private static final String PASSWORD = "epoch";
+   // private static final String PASSWORD = "epoch";
+    private static final String saltString = "Lavos";
     private static final String ALGORITHM = "AES";
     private static final String SECRET_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA1";
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -38,17 +34,19 @@ public class FileEncryption {
 
     private Cipher encryptCipher;
     private OutputStream outFile;
-    private byte[] salt;
+
     private SecretKey secret;
-    private byte[] iv;  //TODO since we are not going to store the IV/salt we need a PBE without salt and IV
+    private IvParameterSpec iv;
     private  byte[] bytesToEncrypt;
     private String filePath;
+    private String PASSWORD;
 
     public static final String TAG = "File encryption class :";
 
-    public FileEncryption(String fileToEncryptPath, RandomAccessFile fileToEncryptData) {
+    public FileEncryption(String fileToEncryptPath, RandomAccessFile fileToEncryptData, String password) {
 
         filePath = fileToEncryptPath;
+        this.PASSWORD = password;
 
         try {
                 FileInputStream fileToEncrypt = new FileInputStream(fileToEncryptPath);
@@ -65,10 +63,9 @@ public class FileEncryption {
 
     private void encryptFile(String key) throws Exception {
 
-            this.makeSalt();
             this.makeSecretKey(key);
-            this.makeCipher();
             this.makeIV();
+            this.makeCipher();
             this.makeOutFile();
 
             try {
@@ -104,16 +101,10 @@ public class FileEncryption {
 
         }
 
-        private void makeSalt() {
-            salt = new byte[8];
-            SecureRandom secureRandom = new SecureRandom();
-            secureRandom.nextBytes(salt);
-
-        }
 
         private void makeSecretKey(String key) throws  Exception {
             SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_KEY_FACTORY_ALGORITHM);
-            KeySpec spec = new PBEKeySpec(key.toCharArray(),salt,ITERATION,KEY_LENGTH );
+            KeySpec spec = new PBEKeySpec(key.toCharArray(),saltString.getBytes(),ITERATION,KEY_LENGTH );
             SecretKey tmp = factory.generateSecret(spec);
             secret = new SecretKeySpec(tmp.getEncoded(),ALGORITHM);
         }
@@ -121,13 +112,14 @@ public class FileEncryption {
 
         private void makeCipher() throws Exception{
             encryptCipher = Cipher.getInstance(TRANSFORMATION);
-            encryptCipher.init(Cipher.ENCRYPT_MODE,secret);
+            encryptCipher.init(Cipher.ENCRYPT_MODE,secret,iv);
 
         }
 
-        private void makeIV()throws Exception{
-            AlgorithmParameters params = encryptCipher.getParameters();
-            iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+        private void makeIV(){
+            byte[] ivspec = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            iv = new IvParameterSpec(ivspec);
+
         }
 
     }

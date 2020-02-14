@@ -7,4 +7,9 @@
     <string name="users_folder">My folders</string>
     <string name="encrypt_file">Encrypt this file</string>
     <string name="get_original">Get Original file name</string>
+    <string name="decrypt_this_file">Decrypt this file</string>
+    <string name="crypto_password">Enter a password here</string>
+    <string name="password_dialog_title">Enter a password</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="enter_button">Enter</string>
 </resources>

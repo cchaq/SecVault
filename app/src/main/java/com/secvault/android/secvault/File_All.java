@@ -35,12 +35,10 @@ public class File_All {
 
         fileCursor.moveToFirst();
 
+
         fileOriginalDetails = new File(fileCursor.getString(0));
 
-        Log.i(TAG, fileCursor.getString(0));
-
         copyFile(fileCursor.getString(0));
-
         fileCursor.close();
 
     }

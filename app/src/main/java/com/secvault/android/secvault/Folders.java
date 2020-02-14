@@ -2,7 +2,6 @@ package com.secvault.android.secvault;
 
 import android.content.Context;
 import android.os.Environment;
-import android.os.ParcelUuid;
 import android.util.Log;
 
 import java.io.File;
@@ -18,14 +17,16 @@ public class Folders {
     private List<String> dirListings = new ArrayList<>();
     private List<File> externalFolders = new ArrayList<>();
 
-    public static final String EXTERNAL_FOLDER_DIR = Environment.getExternalStorageDirectory().toString().concat("/SecVaultFolder/");
-    public static final String ENCRYPTED_FOLDER = EXTERNAL_FOLDER_DIR + "/Encrypted/";
+    public static final String EXTERNAL_DIR = Environment.getExternalStorageDirectory().toString();
+    public static final String SEC_VAULT_EXTERNAL_FOLDER_DIR = Environment.getExternalStorageDirectory().toString().concat("/SecVaultFolder/");
+    public static final String ENCRYPTED_FOLDER = SEC_VAULT_EXTERNAL_FOLDER_DIR + "/Encrypted/";
+    public static final String DECRYPTED_FOLDER = SEC_VAULT_EXTERNAL_FOLDER_DIR + "/Decrypted/";
 
 
     //This creates an internal folder
     public boolean createFolder(Context context, String folderName){
 
-        File newFolder = new File(EXTERNAL_FOLDER_DIR,"/"+ folderName);
+        File newFolder = new File(SEC_VAULT_EXTERNAL_FOLDER_DIR,"/"+ folderName);
         Log.i(TAG,"Dir = " + context.getFilesDir().getPath());
 
         if (!doesFolderExist(newFolder)){
@@ -46,7 +47,7 @@ public class Folders {
     }
 
     public List<String> returnListOfDirs(){
-        File rootDirPath = new File(EXTERNAL_FOLDER_DIR);
+        File rootDirPath = new File(SEC_VAULT_EXTERNAL_FOLDER_DIR);
 
         File[] directories = rootDirPath.listFiles();
         if(directories != null) {
@@ -59,8 +60,9 @@ public class Folders {
     }
 
     public void createExternalFolders(){
-        externalFolders.add(new File(EXTERNAL_FOLDER_DIR));
+        externalFolders.add(new File(SEC_VAULT_EXTERNAL_FOLDER_DIR));
         externalFolders.add(new File(ENCRYPTED_FOLDER));
+        externalFolders.add(new File(DECRYPTED_FOLDER));
 
         for(File folder : externalFolders){
             if(!folder.exists()){

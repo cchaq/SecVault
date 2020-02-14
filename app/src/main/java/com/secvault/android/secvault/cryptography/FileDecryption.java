@@ -7,8 +7,6 @@ import com.secvault.android.secvault.Folders;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.security.AlgorithmParameters;
-import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 
 import javax.crypto.Cipher;
@@ -21,7 +19,8 @@ import javax.crypto.spec.SecretKeySpec;
 public class FileDecryption {
 
     private static final String TAG = "File Decryption class: ";
-    private static final String PASSWORD = "epoch";
+    //private static final String PASSWORD = "epoch";
+    private static final String saltString = "Lavos";
     private static final String ALGORITHM = "AES";
     private static final String SECRET_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA1";
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -31,19 +30,23 @@ public class FileDecryption {
     private Cipher encryptCipher;
     private Cipher decryptCipher;
     private OutputStream outFile;
-    private byte[] salt;
     private SecretKey secret;
-    private byte[] iv;
+    private IvParameterSpec iv;
+    private RandomAccessFile fileToDecrypt;
+    private String filePath;
+    private String PASSWORD;
 
 
-    private void decryptFile() throws Exception {
+    public void decryptFile(String fileToDecryptPath, RandomAccessFile fileRAFToDecrypt, String password) throws Exception {
 
+        this.PASSWORD = password;
         this.createCipher();
-
-        RandomAccessFile fileToDecrypt = new RandomAccessFile(Folders.EXTERNAL_FOLDER_DIR + "/Robo/encrypted.jpg", "rw");
-        outFile  = new FileOutputStream(Folders.EXTERNAL_FOLDER_DIR + "/Robo/chrono.jpg");
+        this.filePath = fileToDecryptPath;
 
         try {
+
+            fileToDecrypt = fileRAFToDecrypt;
+            outFile  = new FileOutputStream(Folders.DECRYPTED_FOLDER + returnFileNameOnly());
 
             byte[] bytesToDecrypt = new byte[(int) fileToDecrypt.length()];
             fileToDecrypt.read(bytesToDecrypt);
@@ -62,23 +65,15 @@ public class FileDecryption {
 
     private void createCipher()throws Exception {
 
-        this.makeSalt();
         this.makeSecretKey(PASSWORD);
         this.makeCipher();
         this.makeIV();
         this.makeCipherForDecrypt();
     }
 
-    private void makeSalt() {
-        salt = new byte[8];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(salt);
-
-    }
-
     private void makeSecretKey(String key) throws  Exception {
         SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_KEY_FACTORY_ALGORITHM);
-        KeySpec spec = new PBEKeySpec(key.toCharArray(),salt,ITERATION,KEY_LENGTH );
+        KeySpec spec = new PBEKeySpec(key.toCharArray(),saltString.getBytes(),ITERATION,KEY_LENGTH );
         SecretKey tmp = factory.generateSecret(spec);
         secret = new SecretKeySpec(tmp.getEncoded(),ALGORITHM);
     }
@@ -89,14 +84,24 @@ public class FileDecryption {
 
     }
 
-    private void makeIV()throws Exception{
-        AlgorithmParameters params = encryptCipher.getParameters();
-        iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+    private void makeIV(){
+        byte[] ivspec = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        iv = new IvParameterSpec(ivspec);
+
     }
 
     private void makeCipherForDecrypt() throws Exception{
         decryptCipher = Cipher.getInstance(TRANSFORMATION);
-        decryptCipher.init(Cipher.DECRYPT_MODE,secret, new IvParameterSpec(iv));
+        decryptCipher.init(Cipher.DECRYPT_MODE,secret, iv);
     }
+
+
+    private String returnFileNameOnly(){
+        String[] fileNameSplitBySlash = filePath.split("/");
+        String[] fileNameSplitByADot = fileNameSplitBySlash[fileNameSplitBySlash.length -1].split("[.]");
+        return fileNameSplitByADot[0];
+
+    }
+
 
 }

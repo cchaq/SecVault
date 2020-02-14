@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.secvault.android.secvault.cryptography.Encode;
 import com.secvault.android.secvault.cryptography.Encryption;
-import com.secvault.android.secvault.cryptography.FileEncryption;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,7 +59,7 @@ public class EncryptAll extends Activity {
                 outFile.write(buf, 0, bytesRead);
             }
 
-       //     copiedFile = new RandomAccessFile(fileOutputDirString, "rw");
+            //     copiedFile = new RandomAccessFile(fileOutputDirString, "rw");
             copiedFile = this.returnRAFFileOfPassedFilePath(fileOutputDirString);
 
             //the story of encoding and encrypting
@@ -84,7 +83,7 @@ public class EncryptAll extends Activity {
     private void encodeFileNameToBytes(){
 
         fileName = fileSelectedByUser.getName();
-     //   addNullTerminatorToFileName(); //not needed because i am adding the null term in writeBytesIntoFile
+        //   addNullTerminatorToFileName(); //not needed because i am adding the null term in writeBytesIntoFile
         fileNameToBytes = fileName.getBytes();
     }
 
@@ -108,7 +107,7 @@ public class EncryptAll extends Activity {
         try{
 
             copiedFile.seek(copiedFile.length());
-         //   copiedFile.seek(whereToStartAddingBytes);
+            //   copiedFile.seek(whereToStartAddingBytes);
             List<Byte> bytesToEmbed = encryptionClass.returnListOfLSBBytes();
             copiedFile.write(0x63); //have to do it byte by byte
             copiedFile.write(0x68);

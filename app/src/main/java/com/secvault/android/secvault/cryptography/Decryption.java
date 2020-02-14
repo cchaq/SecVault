@@ -65,9 +65,7 @@ public class Decryption {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 
     private void findChor(){
 

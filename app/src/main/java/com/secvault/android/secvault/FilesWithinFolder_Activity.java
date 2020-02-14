@@ -23,11 +23,13 @@ import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-public class FilesWithinFolder_Activity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class FilesWithinFolder_Activity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener,
+        PasswordDialogFragment.NoticeDialogListener {
 
     private static final int fileCodeTrue = 1;
     private static final int resultCodeTrue = -1;
     private static final String TAG = "FWF_ACTIVITY";
+    private static final String toastEnterPassword = "Please enter a password.";
     private String fullFilePath;
 
     private  ContentResolver contentResolver;
@@ -43,9 +45,12 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
     private FileEncryption fileEncryption_class;
     private EncryptAll encryptAll_class = new EncryptAll();
 
-    File_All file_allClass = new File_All();
-    FilesWithinFolder filesWithinFolder = new FilesWithinFolder();
+    private File_All file_allClass = new File_All();
+    private FilesWithinFolder filesWithinFolder = new FilesWithinFolder();
     private Decryption decryption;
+    private PasswordDialogFragment passwordDialogFragment;
+    private String passwordFromUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +65,6 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
 
         getFolderPath(getFromRootDirIntent);
         setFABtoLoadFile();
-
-        Log.i(TAG,"ON CREATE ACTIVATED!");
 
     }
 
@@ -86,9 +89,13 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
     }
 
     // https://developer.android.com/training/basics/intents/result
+    //Thanks to Drozer, we can get the right activity needed. Simply use action get content, then
+    //use photo picker and keep an eye on logcat to see which activity is used to get the photos.
     private void FABtoLoadFile(){
 
         Intent copyToFile = new Intent(Intent.ACTION_GET_CONTENT);
+        copyToFile.setClassName("com.google.android.apps.photos",
+                "com.google.android.apps.photos.picker.external.ExternalPickerActivity");
         copyToFile.setType("*/*");
         startActivityForResult(copyToFile, fileCodeTrue);
     }
@@ -97,12 +104,12 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent fileSelected){
 
-        if(requestCode == fileCodeTrue) {
-            if(resultCode == resultCodeTrue) {
-                fileUri = fileSelected.getData();
-                file_allClass.passDestFolder(folderPath);
-                file_allClass.fromFileGetRealData(fileUri, contentResolver);
-            }
+        if(requestCode == fileCodeTrue && resultCode == resultCodeTrue) {
+            fileUri = fileSelected.getData();
+            file_allClass.passDestFolder(folderPath);
+            file_allClass.fromFileGetRealData(fileUri, contentResolver);
+        }else{
+            this.onResume();
         }
     }
 
@@ -144,8 +151,7 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getItemId()){
             case R.id.encrypt_file:
-                Toast.makeText(this, "The app. is encrypting your file", Toast.LENGTH_SHORT).show();
-                this.encryptFile();
+                this.passworDialog();
                 return  true;
 
             case R.id.get_file_and_name:
@@ -158,7 +164,7 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
     }
 
 
-    private void listFilesInFolder(){
+    public void listFilesInFolder(){
 
         fileListings = filesWithinFolder.returnFilesList(getFromRootDirIntent);
         arrayAdapterDirListings = new ArrayAdapter<>(this,
@@ -190,11 +196,22 @@ public class FilesWithinFolder_Activity extends AppCompatActivity implements Pop
     }
 
 
+    private void passworDialog() {
+        passwordDialogFragment = new PasswordDialogFragment();
+        passwordDialogFragment.show(getSupportFragmentManager(), "Password dialog");
+    }
+
     //This is a plaster :(
     private void encryptFile(){
 
         fileEncryption_class = new FileEncryption(fullFilePath,
-                encryptAll_class.returnRAFFileOfPassedFilePath(fullFilePath));
+                encryptAll_class.returnRAFFileOfPassedFilePath(fullFilePath),passwordFromUser);
+    }
+
+    @Override
+    public void sendPassword(String password) {
+        passwordFromUser = password;
+        this.encryptFile();
     }
 
 }

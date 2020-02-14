@@ -7,4 +7,9 @@
     <string name="users_folder">Mes dossiers</string>
     <string name="encrypt_file">Chiffrer cela</string>
     <string name="get_original">Obtenir le nom du fichier d\'origine</string>
+    <string name="decrypt_this_file">Déchiffrez ce fichier</string>
+    <string name="crypto_password">Entrer un mot de passe ici</string>
+    <string name="password_dialog_title">Entrer un mot de passe</string>
+    <string name="cancel_button">Annuler</string>
+    <string name="enter_button">Entrer</string>
 </resources>
